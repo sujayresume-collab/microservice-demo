@@ -21,16 +21,16 @@ docker-compose up -d --build
 This will start:
 - `user-app` (Port 8001)
 - `product-app` (Port 8002)
-- `gateway` (NGINX API Gateway, Port 8080)
+- `gateway` (NGINX API Gateway, Port 8090)
 - `redis` (Port 6380)
 - `queue-worker` (Background jobs)
 
 ### 3. How to Test & Login
-You can interact with the system via the API Gateway running on port `8080`.
+You can interact with the system via the API Gateway running on port `8090`.
 
 **Register a User:**
 ```bash
-curl -X POST http://localhost:8080/api/register \
+curl -X POST http://localhost:8090/api/register \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -d '{"name": "John Doe", "email": "john@example.com", "password": "password"}'
@@ -39,7 +39,7 @@ curl -X POST http://localhost:8080/api/register \
 
 **Login:**
 ```bash
-curl -X POST http://localhost:8080/api/login \
+curl -X POST http://localhost:8090/api/login \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -d '{"email": "john@example.com", "password": "password"}'
@@ -49,7 +49,7 @@ curl -X POST http://localhost:8080/api/login \
 **Create a Product (Requires Auth):**
 Copy the `access_token` you got from the login step and use it as a Bearer token:
 ```bash
-curl -X POST http://localhost:8080/api/products \
+curl -X POST http://localhost:8090/api/products \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -59,8 +59,8 @@ curl -X POST http://localhost:8080/api/products \
 
 **List Products:**
 ```bash
-curl -X GET http://localhost:8080/api/products
+curl -X GET http://localhost:8090/api/products
 ```
 
 ### Health Endpoints
-- User Service Health: `http://localhost:8080/api/health` (Routed to user-service)
+- User Service Health: `http://localhost:8090/api/health` (Routed to user-service)
