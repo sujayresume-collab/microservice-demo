@@ -26,4 +26,4 @@ jobs:
       working-directory: ./product-service
 
     - name: Build Docker Images
-      run: docker-compose build
+      run: docker compose build
