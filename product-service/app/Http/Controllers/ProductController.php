@@ -20,6 +20,8 @@ class ProductController extends Controller
             'description' => 'nullable|string'
         ]);
         
+        $validated['user_id'] = $request->input('user_id');
+        
         $product = Product::create($validated);
         return response()->json($product, 201);
     }

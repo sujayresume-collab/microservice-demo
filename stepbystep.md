@@ -55,11 +55,48 @@ curl -X POST http://localhost:8090/api/products \
 -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
 -d '{"name": "Laptop", "price": 999.99, "description": "High-end laptop"}'
 ```
-*The `product-service` will intercept this request, communicate with `user-service` to validate the Sanctum token, and if valid, create the product!*
+*The `product-service` will intercept this request, communicate with `user-service` to validate the Sanctum token, extract the authenticated user's ID, and save the product with the `user_id` mapping!*
 
 **List Products:**
 ```bash
 curl -X GET http://localhost:8090/api/products
+```
+*(You will now see the `user_id` field in the returned product JSON)*
+
+---
+
+## Architecture & Pipeline Diagrams
+
+### Microservices & Docker Flow
+```mermaid
+graph TD
+    Client([Client / Postman / curl]) -->|HTTP :8090| NGINX(NGINX API Gateway)
+    
+    subgraph Docker Network
+        NGINX -->|/api/register, /api/login| UserApp(User Service App<br/>PHP 8.3)
+        NGINX -->|/api/products| ProductApp(Product Service App<br/>PHP 8.3)
+        
+        ProductApp <-->|HTTP Token Verification| UserApp
+        ProductApp -->|Push Job| Redis(Redis Cache/Queue)
+        QueueWorker(Queue Worker) -->|Pull Job| Redis
+    end
+
+    subgraph Host Machine Databases
+        UserApp -->|Port 3306| MySQL[(MySQL: user_db)]
+        ProductApp -->|Port 5432| Postgres[(PostgreSQL: product_db)]
+        QueueWorker --> Postgres
+    end
+```
+
+### CI/CD Pipeline Flow (GitHub Actions)
+```mermaid
+flowchart LR
+    Push(Push to Main) --> GitHubActions[GitHub Actions Triggered]
+    GitHubActions --> Checkout[Checkout v4]
+    Checkout --> SetupPHP[Setup PHP 8.3]
+    SetupPHP --> Composer[Composer Install dependencies]
+    Composer --> Build[Docker Compose Build]
+    Build --> Complete((Pipeline Complete))
 ```
 
 ### Health Endpoints

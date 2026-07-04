@@ -23,6 +23,8 @@ class VerifyUserServiceToken
             $response = Http::withToken($token)->get($userServiceUrl . '/api/user');
 
             if ($response->successful()) {
+                $user = $response->json();
+                $request->merge(['user_id' => $user['id'] ?? null]);
                 return $next($request);
             }
         } catch (\Exception $e) {
