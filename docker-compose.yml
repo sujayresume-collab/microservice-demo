@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - user-app
+      - product-app
+
+  user-app:
+    build:
+      context: ./user-service
+    ports:
+      - "8001:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_DATABASE=user_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=Sujay@1977
+      - REDIS_HOST=redis
+      
+  product-app:
+    build:
+      context: ./product-service
+    ports:
+      - "8002:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_DATABASE=product_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=Sujay@1977
+      - REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-app:8000
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+
+  queue-worker:
+    build:
+      context: ./product-service
+    command: php artisan queue:work
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_DATABASE=product_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=Sujay@1977
+      - REDIS_HOST=redis
