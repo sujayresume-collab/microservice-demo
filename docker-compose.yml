@@ -6,6 +6,7 @@ services:
       context: ./gateway
     ports:
       - "8090:80"
+    restart: unless-stopped
     depends_on:
       - user-app
       - product-app
@@ -15,6 +16,7 @@ services:
       context: ./user-service
     ports:
       - "8001:8000"
+    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -31,6 +33,7 @@ services:
       context: ./product-service
     ports:
       - "8002:8000"
+    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -47,11 +50,13 @@ services:
     image: redis:alpine
     ports:
       - "6380:6379"
+    restart: unless-stopped
 
   queue-worker:
     build:
       context: ./product-service
     command: php artisan queue:work
+    restart: unless-stopped
     depends_on:
       - redis
     extra_hosts:
