@@ -7,8 +7,8 @@ This is a demonstration project containing two Laravel microservices, an API gat
 ### 1. Database Configuration
 This project uses your host machine's existing databases.
 It assumes:
-- **MySQL**: running on host port 3306, user `root`, password `Sujay@1977`. Database `user_db`.
-- **PostgreSQL**: running on host port 5432, user `postgres`, password `Sujay@1977`. Database `product_db`.
+- **MySQL**: running on host port 3306, user `root`, password `Sujay@test`. Database `user_db`.
+- **PostgreSQL**: running on host port 5432, user `postgres`, password `Sujay@test`. Database `product_db`.
 
 *(If you wanted to use completely isolated containerized databases instead of the host machine's, you would add `mysql` and `postgres` service blocks to `docker-compose.yml` and remove the `extra_hosts` configuration. But per our setup, it points to the host).*
 
